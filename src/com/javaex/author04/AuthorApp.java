@@ -1,4 +1,4 @@
-package com.javaex.author02; //메인은 dao랑만 얘기중
+package com.javaex.author04; 
 
 import java.util.List;
 

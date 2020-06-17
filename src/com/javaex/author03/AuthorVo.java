@@ -2,7 +2,7 @@
  * dao만들기, vo사용
  */
 
-package com.javaex.author02;
+package com.javaex.author03;
 
 public class AuthorVo {
 

@@ -1,0 +1,210 @@
+package com.javaex.author04;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
+public class AuthorDao {
+
+	//0번은 공통으로 뺏고 1,2 메소드로 묶었다
+	//필드
+	
+	//0. import java.sql.*; --import 시키기
+	private Connection conn = null; //메모리에 주소담을 공간만 차지
+	private PreparedStatement pstmt = null;
+	private ResultSet rs = null;
+
+	//외부에 접근 못하게 private
+	private String driver = "oracle.jdbc.driver.OracleDriver";
+	private String url = "jdbc:oracle:thin:@localhost:1521:xe";
+	private String id = "webdb";
+	private String pw = "webdb";
+	
+	// 생성자
+
+	public AuthorDao() {
+	}
+	
+	// g/s
+
+	// 메소드
+
+	// 일반메소드
+	
+	//connection 가져오기
+	private void getConnect() {
+		try {
+			// 1. JDBC 드라이버 (Oracle) 로딩
+			Class.forName(driver); 
+			// 2. Connection 얻어오기
+			conn = DriverManager.getConnection(url, id, pw); 
+			System.out.println("접속 성공");	
+		}catch(ClassNotFoundException e) {
+			System.out.println("error: 드라이버 로딩 실패 - " + e);
+		}catch (SQLException e) {
+			System.out.println("error:" + e);
+		}
+			
+	}
+		
+		
+	//자원정리
+	public void close() {
+		
+		// 5. 자원정리
+		try {
+			if (rs != null) {
+				rs.close();
+			}
+			if (pstmt != null) {
+				pstmt.close();
+			}
+			if (conn != null) {
+				conn.close();
+			}
+		} catch (SQLException e) {
+			System.out.println("error:" + e);
+		}
+		
+	}
+	
+	//작가 추가
+	public void authorInsert(AuthorVo authorVo) {
+		getConnect();
+		
+		try {
+			
+			// 3. SQL문 준비 / 바인딩 / 실행
+			// sql 준비
+			String query = "INSERT INTO author VALUES (seq_author_id.nextval, ?, ?)"; 																			
+			pstmt = conn.prepareStatement(query); 
+			pstmt.setString(1, authorVo.getAuthorName()); 
+			pstmt.setString(2, authorVo.getAuthorDesc());
+			// 실행
+			int count = pstmt.executeUpdate();
+			// 4.결과처리
+			System.out.println(count + "건 처리되었습니다.");
+
+		} catch (SQLException e) {
+			System.out.println("error:" + e);
+		} 
+		
+		close();
+		
+	}
+
+	// 작가 수정
+	public void authorUpdate(AuthorVo authorVo) {
+		
+		getConnect();
+		
+		try {
+			
+		    // 3. SQL문 준비 / 바인딩 / 실행
+			String query = ""; //쿼리문 문자열만들기, ? 주의
+			query +=" update author ";
+			query +=" set author_name = ? , ";
+			query +="     author_desc = ? ";
+			query +=" where author_id = ? ";
+
+			pstmt = conn.prepareStatement(query); //쿼리로 만들기
+			
+			pstmt.setString(1, authorVo.getAuthorName()); // ?(물음표) 중 1번째, 순서중요
+			pstmt.setString(2, authorVo.getAuthorDesc()); // ?(물음표) 중 2번째, 순서중요
+			pstmt.setInt(3, authorVo.getAuthorId()); // ?(물음표) 중 3번째, 순서중요
+
+			int count = pstmt.executeUpdate();  //쿼리문 실행
+			
+		    // 4.결과처리
+			System.out.println(count + "건 처리되었습니다.");
+			
+			
+		
+		} catch (SQLException e) {
+		    System.out.println("error:" + e);
+		}
+		
+		close();
+		
+	}
+	
+	// 작가 삭제
+	public void authorDelete(int authorId) {
+		getConnect();
+		
+		try {
+			
+		    // 3. SQL문 준비 / 바인딩 / 실행
+			String query = ""; //쿼리문 문자열만들기, ? 주의
+			query +=" delete from author ";
+			query +=" where author_id = ? ";
+			pstmt = conn.prepareStatement(query); //쿼리로 만들기
+			
+			
+			pstmt.setInt(1,authorId); //?(물음표) 중 1번째, 순서중요
+			//아직까진 자바에서 실행 안되고있다
+			
+			int count = pstmt.executeUpdate();  //쿼리문 실행
+			//실행됨
+			
+			//결과처리
+			System.out.println(count + "건 처리되었습니다.");
+			
+		
+		} catch (SQLException e) {
+		    System.out.println("error:" + e);
+		} 
+		
+		close();
+		
+	}
+	
+	
+	// 작가 리스트 List<AuthorVo> authorList이거만들어줄거야
+	public List<AuthorVo> getAuthorList() { //배열이 준비되어있음 동그라미 준비해야해
+		//리스트준비
+		List<AuthorVo> authorList = new ArrayList<AuthorVo>();
+		getConnect();
+
+		try {			
+			// 3. SQL문 준비 / 바인딩 / 실행 완성된 sql문을 가져와서 작성할 것. 작가정보다가져와
+			String query = "";
+			query += "select author_id, "; // 뒤를 무조건 한칸 띄어준다
+			query += "		 author_name, ";
+			query += "		 author_desc ";
+			query += "from author";
+
+			System.out.println(query);
+
+			// 바인딩
+			pstmt = conn.prepareStatement(query);// 진짜쿼리문
+
+			// 실행
+			rs = pstmt.executeQuery(); //표형태로올거임
+
+			// 4.결과처리 꼭 이해해야만한다
+			while (rs.next()) { //쓰고버리고만 했는데 리스트로 표현하고파 (아래주석막아놈) //동그라미 만들어주는곳
+				int authorId = rs.getInt("author_id");
+				String authorName = rs.getString("author_name");
+				String authorDesc = rs.getString("author_desc");
+				
+				//리스트에 추가하는 코드 필요함
+				AuthorVo authorVo = new AuthorVo(authorId,authorName,authorDesc);
+				authorList.add(authorVo);
+				//System.out.println(author_id + "\t" + author_name + "\t" + author_desc + "\t");
+			}
+
+	
+		} catch (SQLException e) {
+		  System.out.println("error:" + e);
+		} 
+		
+			close();
+			
+			return authorList;
+	}
+}

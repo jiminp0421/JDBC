@@ -12,7 +12,7 @@ public class BookInsertTest {
 		//1. JDBC 드라이버 (Oracle) 로딩
 		//2. Connection 얻어오기
 		//3. SQL문 준비 / 바인딩 / 실행
-		// 4.결과처리
+		//4.결과처리
 		//5. 자원정리
 		
 		// 0. import java.sql.*;

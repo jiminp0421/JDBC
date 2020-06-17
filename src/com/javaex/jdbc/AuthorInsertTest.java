@@ -15,7 +15,6 @@ public class AuthorInsertTest {
 		// 4.결과처리
 		//5. 자원정리
 
-
 		// 0. import java.sql.*; --import 시키기  
 		Connection conn = null;
 		PreparedStatement pstmt = null;

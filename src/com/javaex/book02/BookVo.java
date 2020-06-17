@@ -1,4 +1,4 @@
-package com.javaex.book01;
+package com.javaex.book02;
 
 public class BookVo {
 	
@@ -9,17 +9,26 @@ public class BookVo {
 	private String pubs;
 	private String pubDate;
 	
-	public BookVo() {}
-	
-	public BookVo(int bookId, String title, String pubs, String pubDate, int authorId) {
+
+	public BookVo(String title, String pubs, String pubDate, int authorId) {
 		super();
-		this.bookId = bookId;
 		this.title = title;
 		this.pubs = pubs;
 		this.pubDate = pubDate;
 		this.authorId = authorId;
+	}
+	
+	
+	public BookVo(int authorId, String title, String pubs, String pubDate, int bookId) {
+		super();
+		this.authorId = authorId;
+		this.title = title;
+		this.pubs = pubs;
+		this.pubDate = pubDate;
+		this.bookId = bookId;
 		
 	}
+
 	
 	public int getBookId() {
 		return bookId;
@@ -61,12 +70,13 @@ public class BookVo {
 		this.pubDate = pubDate;
 	}
 
+
 	@Override
 	public String toString() {
 		return "BookVo [bookId=" + bookId + ", authorId=" + authorId + ", title=" + title + ", pubs=" + pubs
 				+ ", pubDate=" + pubDate + "]";
 	}
-	
+
 	
 
 }
